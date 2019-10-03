@@ -1,3 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Copyright 2008-2019, Province of British Columbia All rights reserved. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -6,10 +8,62 @@
 	<groupId>ca.bc.gov.ols</groupId>
 	<artifactId>ols-util</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
+	<inceptionYear>2008</inceptionYear>
 	<packaging>jar</packaging>
 
 	<name>ols-util</name>
-	<url>http://maven.apache.org</url>
+	<url>https://bcgov.github.io/ols-util/</url>
+
+	<organization>
+		<name>Province of British Columbia</name>
+		<url>https://www.gov.bc.ca/</url>
+	</organization>
+
+	<licenses>
+		<license>
+			<name>Apache License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+	<scm>
+		<connection>scm:git:https://github.com/bcgov/ols-util.git</connection>
+		<developerConnection>scm:git:git@github.com:bcgov/ols-util.git</developerConnection>
+		<url>https://github.com/bcgov/ols-util</url>
+	</scm>
+
+	<issueManagement>
+		<system>github.com</system>
+		<url>https://github.com/bcgov/ols-util/issues</url>
+	</issueManagement>
+
+	<developers>
+		<developer>
+			<name>Chris Hodgson</name>
+			<email>chodgson@refractions.net</email>
+			<organization>Refractions Research Inc.</organization>
+			<organizationUrl>http://www.refractions.net/</organizationUrl>
+			<timezone>PST</timezone>
+		</developer>
+	</developers>
+
+	<contributors>
+		<contributor>
+			<name>Michael Ross</name>
+			<email>Michael.RA.Ross@gov.bc.ca</email>
+			<organization>Province of British Columbia</organization>
+			<organizationUrl>https://www.gov.bc.ca</organizationUrl>
+			<timezone>PST</timezone>
+		</contributor>
+		<contributor>
+			<name>Brian Kelsey</name>
+			<email>Brian.Kelsey@gov.bc.ca</email>
+			<organization>Province of British Columbia</organization>
+			<organizationUrl>https://www.gov.bc.ca</organizationUrl>
+			<timezone>PST</timezone>
+		</contributor>
+	</contributors>
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -66,20 +120,14 @@
 				<artifactId>license-maven-plugin</artifactId>
 				<version>3.0</version>
 				<configuration>
-					<header>src/license/license-header.txt</header>
+					<header>src/license/APACHE-2.txt</header>
 					<properties>
 						<owner>Province of British Columbia</owner>
-						<years>2008-2019</years>
+						<year>2019</year>
 					</properties>
-					<excludes>
-						<exclude>**/*.txt</exclude>
-						<exclude>**/*.TXT</exclude>
-						<exclude>data/**</exclude>
-						<exclude>**/js/lib/**</exclude>
-						<exclude>src/test/resources/**</exclude>
-						<exclude>src/main/resources/**</exclude>
-						<exclude>**/Jenkinsfile</exclude>
-					</excludes>
+					<includes>
+		                <include>**/*.java</include>
+					</includes>
 					<keywords>
 						<keyword>copyright</keyword>
 						<keyword>license</keyword>
@@ -136,7 +184,7 @@
 			<artifactId>spring-web</artifactId>
 			<version>${springframework.version}</version>
 		</dependency>
-		
+
 	</dependencies>
 
 </project>
