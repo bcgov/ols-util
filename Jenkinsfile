@@ -11,7 +11,7 @@ node ('master'){
 		  extensions: [[$class: 'WipeWorkspace']], 
 		  gitTool: 'Default', 
 		  submoduleCfg: [], 
-		  userRemoteConfigs: [[url: 'https://github.com/bcgov/ols-geocoder']]
+		  userRemoteConfigs: [[url: 'https://github.com/bcgov/ols-util']]
 		 ])
 	    
         withMaven(jdk: 'ojdk', maven: 'm3') {
