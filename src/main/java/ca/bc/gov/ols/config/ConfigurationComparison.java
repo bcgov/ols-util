@@ -18,6 +18,7 @@ package ca.bc.gov.ols.config;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ConfigurationComparison {
 
@@ -25,8 +26,12 @@ public class ConfigurationComparison {
 	protected int otherConfigParamCount = 0;
 	protected List<ConfigDifference<ConfigurationParameter>> configParamDiffs;
 
-	public ConfigurationComparison() {
-		super();
+	public ConfigurationComparison(ConfigurationStore curConfig, ConfigurationStore otherConfig) {
+		List<ConfigurationParameter> curConfigParams = curConfig.getConfigParams().collect(Collectors.toList());
+		curConfigParamCount = curConfigParams.size();
+		List<ConfigurationParameter> otherConfigParams = otherConfig.getConfigParams().collect(Collectors.toList());
+		otherConfigParamCount = otherConfigParams.size();
+		configParamDiffs = diffLists(curConfigParams, otherConfigParams);
 	}
 
 	protected <T extends Comparable<T>> List<ConfigDifference<T>> diffLists(List<T> a, List<T> b) {
