@@ -1,2 +1,2 @@
-# ols-geocoder
-Physical Address Geocoder
+# ols-util
+Utilities shared between OLS packages.
