@@ -26,15 +26,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CompletionException;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.datastax.oss.driver.api.core.CqlSession;
-import com.datastax.oss.driver.api.core.cql.AsyncResultSet;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
@@ -45,6 +42,7 @@ import com.datastax.oss.driver.internal.core.config.typesafe.DefaultDriverConfig
 import com.typesafe.config.ConfigFactory;
 
 import au.com.bytecode.opencsv.CSVReader;
+import ca.bc.gov.ols.rowreader.DatastaxResultSetRowReader;
 
 public class CassandraConfigurationStore implements ConfigurationStore {
 	private static final Logger logger = LoggerFactory.getLogger(CassandraConfigurationStore.class.getCanonicalName());
@@ -53,7 +51,6 @@ public class CassandraConfigurationStore implements ConfigurationStore {
 	protected String keyspace;
 	protected String appId;
 	protected CqlSession session;
-
 
 	public CassandraConfigurationStore(Properties bootstrapConfig) {
 		this.bootstrapConfig = bootstrapConfig;
@@ -84,14 +81,15 @@ public class CassandraConfigurationStore implements ConfigurationStore {
 
 	@Override
 	public Stream<ConfigurationParameter> getConfigParams() {
-		List<ConfigurationParameter> configParams = new ArrayList<ConfigurationParameter>();
+//		List<ConfigurationParameter> configParams = new ArrayList<ConfigurationParameter>();
 		ResultSet rs = session.execute("SELECT app_id, config_param_name, config_param_value FROM " 
 				+ keyspace + ".BGEO_CONFIGURATION_PARAMETERS WHERE app_id = '" + appId + "'" );
-		for (Row row : rs) {
-			configParams.add(new ConfigurationParameter(row.getString("app_id"),
-					row.getString("config_param_name"), row.getString("config_param_value")));
-		}
-		return configParams.stream(); 
+//		for (Row row : rs) {
+//			configParams.add(new ConfigurationParameter(row.getString("app_id"),
+//					row.getString("config_param_name"), row.getString("config_param_value")));
+//		}
+//		return configParams.stream(); 
+		return new DatastaxResultSetRowReader(rs).asStream(ConfigurationParameter::new);
 	}
 	
 	@Override 
