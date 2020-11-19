@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +55,7 @@ public class JsonRowReader implements RowReader {
 	public JsonRowReader(String fileName, GeometryFactory gf) {
 		this.gf = gf;
 		try {
-			construct(new BufferedReader(new FileReader(fileName)));
+			construct(new BufferedReader(new FileReader(fileName, StandardCharsets.UTF_8)));
 		} catch(IOException ioe) {
 			logger.error("Error opening stream for file {}.", fileName, ioe);
 			throw new RuntimeException(ioe);
@@ -62,7 +64,7 @@ public class JsonRowReader implements RowReader {
 	
 	public JsonRowReader(InputStream inStream, GeometryFactory gf) {
 		this.gf = gf;
-		construct(new InputStreamReader(inStream));
+		construct(new InputStreamReader(inStream, StandardCharsets.UTF_8));
 	}
 	
 	public JsonRowReader(Reader inReader, GeometryFactory gf) {

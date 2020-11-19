@@ -112,11 +112,14 @@ public interface RowReader {
 	
 	@SuppressWarnings("unchecked")
 	default public <T> Stream<T> asStream(Function<RowReader, T> mappingFunction) {
-		final RowReaderStreamInvocationHandler<T> handler = 
-				new RowReaderStreamInvocationHandler<T>(this, mappingFunction);
-		Stream<T> proxy = (Stream<T>) Proxy.newProxyInstance(getClass().getClassLoader(),
-				new Class<?>[] { Stream.class }, handler);
-		return proxy;
+		return Stream.generate(() -> null)
+				.takeWhile(x -> this.next())
+				.map(n -> mappingFunction.apply(this));
+//		final RowReaderStreamInvocationHandler<T> handler = 
+//				new RowReaderStreamInvocationHandler<T>(this, mappingFunction);
+//		Stream<T> proxy = (Stream<T>) Proxy.newProxyInstance(getClass().getClassLoader(),
+//				new Class<?>[] { Stream.class }, handler);
+//		return proxy;
 	}
 	
 	/**

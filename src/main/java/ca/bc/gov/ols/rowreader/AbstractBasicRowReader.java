@@ -16,6 +16,7 @@
 package ca.bc.gov.ols.rowreader;
 
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -82,7 +83,11 @@ public abstract class AbstractBasicRowReader implements RowReader {
 		if(result == null) {
 			return null;
 		}
-		return LocalDate.parse(result.toString());
+		String dateStr = result.toString();
+		if(dateStr.contains("-")) {
+			return LocalDate.parse(dateStr);
+		}
+		return DateTimeFormatter.BASIC_ISO_DATE.parse(dateStr, LocalDate::from);
 	}
 	
 	@Override
