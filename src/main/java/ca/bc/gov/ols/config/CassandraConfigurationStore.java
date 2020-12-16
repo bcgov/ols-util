@@ -42,29 +42,38 @@ import com.datastax.oss.driver.internal.core.config.typesafe.DefaultDriverConfig
 import com.typesafe.config.ConfigFactory;
 
 import au.com.bytecode.opencsv.CSVReader;
+import ca.bc.gov.ols.rowreader.DatastaxResultSetRowReader;
 
 public class CassandraConfigurationStore implements ConfigurationStore {
 	private static final Logger logger = LoggerFactory.getLogger(CassandraConfigurationStore.class.getCanonicalName());
 	
-	protected static final String APP_ID = "BGEO";
-
 	protected Properties bootstrapConfig;
-
 	protected String keyspace;
-	
+	protected String appId;
 	protected CqlSession session;
-
 
 	public CassandraConfigurationStore(Properties bootstrapConfig) {
 		this.bootstrapConfig = bootstrapConfig;
 		keyspace = bootstrapConfig.getProperty("OLS_CASSANDRA_KEYSPACE");
+		appId = bootstrapConfig.getProperty("OLS_CASSANDRA_APP_ID");
+		String[] contactPoints = bootstrapConfig.getProperty("OLS_CASSANDRA_CONTACT_POINT").split(",");
+		List<InetSocketAddress> cpAddresses = new ArrayList<InetSocketAddress>(contactPoints.length); 
+		for(String cp : contactPoints) {
+			if(cp == null || cp.isBlank()) continue;
+			InetSocketAddress addr = new InetSocketAddress(cp, 9042);
+			if(addr.isUnresolved()) {
+				logger.error("Unable to resolve Cassandra contact point address: '" + cp + "'");
+			} else {
+				cpAddresses.add(addr);
+			}
+		}
 		this.session = CqlSession.builder()
 				.withConfigLoader(new DefaultDriverConfigLoader(() -> {
 						ConfigFactory.invalidateCaches();
 						return ConfigFactory.load(getClass().getClassLoader()).getConfig(DefaultDriverConfigLoader.DEFAULT_ROOT_PATH);
 				}))
 				.withClassLoader(getClass().getClassLoader())
-				.addContactPoint(new InetSocketAddress(bootstrapConfig.getProperty("OLS_CASSANDRA_CONTACT_POINT"), 9042))
+				.addContactPoints(cpAddresses)
 				.withLocalDatacenter(bootstrapConfig.getProperty("OLS_CASSANDRA_LOCAL_DATACENTER"))
 				.build();
 		validateKeyspace();
@@ -72,20 +81,21 @@ public class CassandraConfigurationStore implements ConfigurationStore {
 
 	@Override
 	public Stream<ConfigurationParameter> getConfigParams() {
-		List<ConfigurationParameter> configParams = new ArrayList<ConfigurationParameter>();
+//		List<ConfigurationParameter> configParams = new ArrayList<ConfigurationParameter>();
 		ResultSet rs = session.execute("SELECT app_id, config_param_name, config_param_value FROM " 
-				+ keyspace + ".BGEO_CONFIGURATION_PARAMETERS WHERE app_id = '" + APP_ID + "'" );
-		for (Row row : rs) {
-			configParams.add(new ConfigurationParameter(row.getString("app_id"),
-					row.getString("config_param_name"), row.getString("config_param_value")));
-		}
-		return configParams.stream(); 
+				+ keyspace + ".BGEO_CONFIGURATION_PARAMETERS WHERE app_id = '" + appId + "'" );
+//		for (Row row : rs) {
+//			configParams.add(new ConfigurationParameter(row.getString("app_id"),
+//					row.getString("config_param_name"), row.getString("config_param_value")));
+//		}
+//		return configParams.stream(); 
+		return new DatastaxResultSetRowReader(rs).asStream(ConfigurationParameter::new);
 	}
 	
 	@Override 
 	public Optional<String> getConfigParam(String name) {
 		ResultSet rs = session.execute("SELECT config_param_value FROM " + keyspace 
-				+ ".BGEO_CONFIGURATION_PARAMETERS WHERE app_id = '" + APP_ID + "' AND config_param_name = '" + name + "'");
+				+ ".BGEO_CONFIGURATION_PARAMETERS WHERE app_id = '" + appId + "' AND config_param_name = '" + name + "'");
 		Row row = rs.one();
 		if(row != null) {
 			return Optional.of(row.getString("config_param_value"));
@@ -96,14 +106,14 @@ public class CassandraConfigurationStore implements ConfigurationStore {
 	@Override
 	public void setConfigParam(ConfigurationParameter param) {
 		SimpleStatement statement = SimpleStatement.builder("INSERT INTO " + keyspace + ".BGEO_CONFIGURATION_PARAMETERS(app_id, config_param_name, config_param_value) VALUES(?, ?, ?)") 
-				.addPositionalValues(APP_ID, param.getConfigParamName(), param.getConfigParamValue()).build();
+				.addPositionalValues(appId, param.getConfigParamName(), param.getConfigParamValue()).build();
 		session.execute(statement);
 	}
 
 	@Override
 	public void removeConfigParam(ConfigurationParameter param) {
 		SimpleStatement statement = SimpleStatement.builder("DELETE FROM" + keyspace + ".BGEO_CONFIGURATION_PARAMETERS WHERE app_id = ? AND config_param_name = ?")
-				.addPositionalValues(APP_ID, param.getConfigParamName()).build();
+				.addPositionalValues(appId, param.getConfigParamName()).build();
 		session.execute(statement);
 	}
 
@@ -190,11 +200,9 @@ public class CassandraConfigurationStore implements ConfigurationStore {
 				+ keyspace + ".BGEO_CONFIGURATION_PARAMETERS "
 				+ "(APP_ID, CONFIG_PARAM_NAME, CONFIG_PARAM_VALUE) " 
 				+ "VALUES (?, ?, ?);");
-		//List<CompletionStage<AsyncResultSet>> futures = new ArrayList<CompletionStage<AsyncResultSet>>();
 		configStore.getConfigParams().map(configParam ->
-				session.executeAsync(pStatement.bind(configParam.getAppId(), configParam.getConfigParamName(), 
-					configParam.getConfigParamValue())).toCompletableFuture())
-				.map(CompletableFuture::join);
+				session.executeAsync(pStatement.bind(configParam.getAppId(), configParam.getConfigParamName(), configParam.getConfigParamValue()))
+				.toCompletableFuture()).forEach(CompletableFuture::join);
 	}
 
 	@Override

@@ -44,10 +44,12 @@ public class XsvRowWriter implements RowWriter  {
 	}
 	
 	public XsvRowWriter(OutputStream out, char separator, List<String> schema, boolean quotes) {
+		logger.info("XsvRowWriter opened for OutputStream: {}", out);
 		construct(new BufferedWriter(new OutputStreamWriter(out)), separator, schema, quotes);
 	}
 
 	public XsvRowWriter(File file, char separator, List<String> schema, boolean quotes) {
+		logger.info("XsvRowWriter opened for file: {}", file);
 		try {
 			construct(new BufferedWriter(new FileWriter(file)), separator, schema, quotes);
 		} catch(IOException ioe) {
@@ -56,7 +58,6 @@ public class XsvRowWriter implements RowWriter  {
 	}
 
 	private void construct(Writer writer, char separator, List<String> schema, boolean quotes) {
-		logger.info("XsvRowWriter opened for writer: {}", writer);
 		if(quotes) {
 			csvWriter = new CSVWriter(writer, separator);
 		} else {
@@ -87,7 +88,7 @@ public class XsvRowWriter implements RowWriter  {
 	@Override
 	public void close() {
 		try {
-			logger.info("CsvRowWriter closed after writing: {} records", writeCount);
+			logger.info("XsvRowWriter closed after writing: {} records", writeCount);
 			csvWriter.close();
 		} catch (IOException ioe) {
 			throw new RuntimeException(ioe);
