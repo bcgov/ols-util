@@ -74,7 +74,6 @@ public class CassandraConfigurationStore implements ConfigurationStore {
 			        .build();
 		this.session = CqlSession.builder()
 				.withConfigLoader(loader)
-				.withClassLoader(getClass().getClassLoader())
 				.addContactPoints(cpAddresses)
 				.withLocalDatacenter(bootstrapConfig.getProperty("OLS_CASSANDRA_LOCAL_DATACENTER"))
 				.build();
