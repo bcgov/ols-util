@@ -21,6 +21,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.InetSocketAddress;
 import java.nio.charset.Charset;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,14 +33,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.datastax.oss.driver.api.core.CqlSession;
+import com.datastax.oss.driver.api.core.config.DefaultDriverOption;
+import com.datastax.oss.driver.api.core.config.DriverConfigLoader;
 import com.datastax.oss.driver.api.core.cql.PreparedStatement;
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
 import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.metadata.schema.KeyspaceMetadata;
 import com.datastax.oss.driver.api.core.metadata.schema.TableMetadata;
-import com.datastax.oss.driver.internal.core.config.typesafe.DefaultDriverConfigLoader;
-import com.typesafe.config.ConfigFactory;
 
 import au.com.bytecode.opencsv.CSVReader;
 import ca.bc.gov.ols.rowreader.DatastaxResultSetRowReader;
@@ -67,12 +68,12 @@ public class CassandraConfigurationStore implements ConfigurationStore {
 				cpAddresses.add(addr);
 			}
 		}
+		DriverConfigLoader loader =
+			    DriverConfigLoader.programmaticBuilder()
+			        .withDuration(DefaultDriverOption.REQUEST_TIMEOUT, Duration.ofSeconds(10))
+			        .build();
 		this.session = CqlSession.builder()
-				.withConfigLoader(new DefaultDriverConfigLoader(() -> {
-						ConfigFactory.invalidateCaches();
-						return ConfigFactory.load(getClass().getClassLoader()).getConfig(DefaultDriverConfigLoader.DEFAULT_ROOT_PATH);
-				}))
-				.withClassLoader(getClass().getClassLoader())
+				.withConfigLoader(loader)
 				.addContactPoints(cpAddresses)
 				.withLocalDatacenter(bootstrapConfig.getProperty("OLS_CASSANDRA_LOCAL_DATACENTER"))
 				.build();
@@ -82,8 +83,10 @@ public class CassandraConfigurationStore implements ConfigurationStore {
 	@Override
 	public Stream<ConfigurationParameter> getConfigParams() {
 //		List<ConfigurationParameter> configParams = new ArrayList<ConfigurationParameter>();
-		ResultSet rs = session.execute("SELECT app_id, config_param_name, config_param_value FROM " 
-				+ keyspace + ".BGEO_CONFIGURATION_PARAMETERS WHERE app_id = '" + appId + "'" );
+		SimpleStatement st = SimpleStatement.newInstance("SELECT app_id, config_param_name, config_param_value FROM " 
+				+ keyspace + ".BGEO_CONFIGURATION_PARAMETERS WHERE app_id = '" + appId + "'");
+//		st.setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM);
+		ResultSet rs = session.execute(st);
 //		for (Row row : rs) {
 //			configParams.add(new ConfigurationParameter(row.getString("app_id"),
 //					row.getString("config_param_name"), row.getString("config_param_value")));
@@ -94,8 +97,10 @@ public class CassandraConfigurationStore implements ConfigurationStore {
 	
 	@Override 
 	public Optional<String> getConfigParam(String name) {
-		ResultSet rs = session.execute("SELECT config_param_value FROM " + keyspace 
+		SimpleStatement st = SimpleStatement.newInstance("SELECT config_param_value FROM " + keyspace 
 				+ ".BGEO_CONFIGURATION_PARAMETERS WHERE app_id = '" + appId + "' AND config_param_name = '" + name + "'");
+//		st.setConsistencyLevel(DefaultConsistencyLevel.LOCAL_QUORUM);
+		ResultSet rs = session.execute(st);
 		Row row = rs.one();
 		if(row != null) {
 			return Optional.of(row.getString("config_param_value"));
