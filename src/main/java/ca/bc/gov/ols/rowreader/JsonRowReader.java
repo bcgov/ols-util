@@ -15,8 +15,6 @@
  */
 package ca.bc.gov.ols.rowreader;
 
-import gnu.trove.map.hash.THashMap;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -24,22 +22,23 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Point;
+
+import gnu.trove.map.hash.THashMap;
 
 public class JsonRowReader implements RowReader {
 	private static final Logger logger = LoggerFactory.getLogger(JsonRowReader.class.getCanonicalName());
@@ -228,28 +227,45 @@ public class JsonRowReader implements RowReader {
 		return curRow.get(column);
 	}
 	
+	private BigDecimal getNumber(String column) {
+		if(curRow == null) return null;
+		Object value = curRow.get(column);
+		if(value == null) return null;
+		if(value instanceof String) {
+			if(((String)value).isEmpty()) {
+				return null;
+			} else {
+				//TODO could try to parse the string as a number
+				return null;
+			}
+		}
+		return (BigDecimal)value;
+	}
 	@Override
 	public int getInt(String column) {
-		if(curRow == null || curRow.get(column) == null) {
+		BigDecimal value = getNumber(column);
+		if(value == null) {
 			return NULL_INT_VALUE;
 		}
-		return ((BigDecimal)(curRow.get(column))).intValue();
+		return value.intValue();
 	}
 
 	@Override
 	public Integer getInteger(String column) {
-		if(curRow == null || curRow.get(column) == null) {
+		BigDecimal value = getNumber(column);
+		if(value == null) {
 			return null;
 		}
-		return ((BigDecimal)(curRow.get(column))).intValue();
+		return value.intValue();
 	}
 	
 	@Override
 	public double getDouble(String column) {
-		if(curRow == null|| curRow.get(column) == null) {
+		BigDecimal value = getNumber(column);
+		if(value == null) {
 			return Double.NaN;
 		}
-		return ((BigDecimal)(curRow.get(column))).doubleValue();
+		return value.doubleValue();
 	}
 	
 	@Override
