@@ -5,21 +5,21 @@ node ('master'){
 
     stage ('SCM prepare'){
         deleteDir()
-        checkout([$class: 'GitSCM', 
-		  branches: [[name: '*/dev']], // branches: [[name: '${gitTag}']], 
-		  doGenerateSubmoduleConfigurations: false, 
-		  extensions: [[$class: 'WipeWorkspace']], 
-		  gitTool: 'Default', 
-		  submoduleCfg: [], 
+        checkout([$class: 'GitSCM',
+		  branches: [[name: '*/dev']], // branches: [[name: '${gitTag}']],
+		  doGenerateSubmoduleConfigurations: false,
+		  extensions: [[$class: 'WipeWorkspace']],
+		  gitTool: 'Default',
+		  submoduleCfg: [],
 		  userRemoteConfigs: [[url: 'https://github.com/bcgov/ols-util']]
 		 ])
-	    
+
         withMaven(jdk: 'ojdk', maven: 'm3') {
             sh 'mvn versions:set -DnewVersion="${mvnTag}"'
         }
     }
 
- 
+
     stage ('Artifactory configuration'){
         rtMaven.tool = 'm3' // Tool name from Jenkins configuration
         rtMaven.deployer releaseRepo: 'libs-release-local', snapshotRepo: 'libs-snapshot-local', server: server
@@ -28,15 +28,36 @@ node ('master'){
         buildInfo = Artifactory.newBuildInfo()
     }
 
+    stage('SonarQube Analysis') {
+        environment {
+           scannerHome = tool 'appqa'
+        }
+        steps {
+            withSonarQubeEnv('SonarQube') {
+              withMaven(maven:'m3') {
+                  sh 'mvn sonar:sonar -Dsonar.java.source=11'
+              }
+            }
+        }
+    }
+
+    /* stage("Quality Gate") {
+        steps {
+          timeout(time: 1, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: false
+          }
+        }
+    } */
+
     stage ('Maven Install'){
 		env.JAVA_HOME = "${tool 'ojdk'}"
         rtMaven.run pom: 'pom.xml', goals: 'clean install ${mvnTrgt} -Dmaven.test.skip=true', buildInfo: buildInfo
     }
-    
+
     stage ('Artifactory Deploy'){
         rtMaven.deployer.deployArtifacts buildInfo
     }
-    
+
     stage ('Artifactory Publish build info'){
         server.publishBuildInfo buildInfo
     }
