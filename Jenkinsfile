@@ -30,7 +30,7 @@ node ('master'){
 
     stage('SonarQube Analysis') {
         environment {
-           scannerHome = tool 'CODEQA'
+           scannerHome = tool 'appqa'
         }
         //step {
             withSonarQubeEnv('SonarQube') {
