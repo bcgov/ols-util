@@ -36,7 +36,7 @@ node ('master'){
             //withSonarQubeEnv('SonarQube') {
             withSonarQubeEnv('CODEQA') {
               withMaven(maven:'m3') {
-                  sh 'mvn sonar:sonar -Dsonar.java.source=11'
+                  sh 'mvn clean package sonar:sonar -Dsonar.java.source=11'
               }
             }
         //}
