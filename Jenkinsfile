@@ -33,7 +33,8 @@ node ('master'){
            scannerHome = tool 'appqa'
         }
         //step {
-            withSonarQubeEnv('SonarQube') {
+            //withSonarQubeEnv('SonarQube') {
+            withSonarQubeEnv('CODEQA') {
               withMaven(maven:'m3') {
                   sh 'mvn sonar:sonar -Dsonar.java.source=11'
               }
