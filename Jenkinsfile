@@ -32,15 +32,12 @@ node ('master'){
         environment {
            scannerHome = tool 'appqa'
         }
-        //step {
-            //withSonarQubeEnv('SonarQube') {
-            withSonarQubeEnv('CODEQA') {
-		          env.JAVA_HOME = "${tool 'ojdk'}"
-              withMaven(maven:'m3') {
-                  sh 'mvn clean package sonar:sonar -Dsonar.java.source=11'
-              }
-            }
-        //}
+        withSonarQubeEnv('CODEQA') {
+	   env.JAVA_HOME = "${tool 'ojdk'}"
+           withMaven(maven:'m3') {
+              sh 'mvn clean package sonar:sonar -Dsonar.java.source=11'
+           }
+        }
     }
 
     /* stage("Quality Gate") {
