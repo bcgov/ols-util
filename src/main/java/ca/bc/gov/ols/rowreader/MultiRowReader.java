@@ -70,6 +70,11 @@ public class MultiRowReader implements RowReader {
 	}
 
 	@Override
+	public Boolean getBoolean(String column) {
+		return readers[curReader].getBoolean(column);
+	}
+
+	@Override
 	public LocalDate getDate(String column) {
 		return readers[curReader].getDate(column);
 	}

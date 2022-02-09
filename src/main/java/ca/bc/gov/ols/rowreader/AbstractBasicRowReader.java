@@ -78,6 +78,36 @@ public abstract class AbstractBasicRowReader implements RowReader {
 	}
 	
 	@Override
+	public Boolean getBoolean(String column) {
+		Object result = getObject(column);
+		if(result == null || result.toString().isEmpty()) {
+			return null;
+		}
+		if(result instanceof String) {
+			String str = (String)result;
+			if("FALSE".equalsIgnoreCase(str) 
+					|| "F".equalsIgnoreCase(str) 
+					|| "N".equalsIgnoreCase(str) 
+					|| "0".equals(str)) {
+				return Boolean.FALSE;
+			} else if("TRUE".equalsIgnoreCase(str) 
+					|| "T".equalsIgnoreCase(str) 
+					|| "Y".equalsIgnoreCase(str) 
+					|| "1".equals(str)) {
+				return Boolean.TRUE;
+			}
+		} else if(result instanceof Integer) {
+			int i = (Integer)result;
+			if(i == 0) {
+				return Boolean.FALSE;
+			} else if(i == 1) {
+				return Boolean.TRUE;
+			}
+		}
+		return null;
+	}
+	
+	@Override
 	public LocalDate getDate(String column) {
 		Object result = getObject(column);
 		if(result == null) {

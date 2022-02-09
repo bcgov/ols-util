@@ -17,7 +17,7 @@ package ca.bc.gov.ols.rowreader;
 
 import java.util.Map;
 
-public interface RowWriter {
+public interface RowWriter extends AutoCloseable {
 
 	public abstract void close();
 

@@ -70,6 +70,11 @@ public class DatastaxResultSetRowReader implements RowReader {
 	}
 	
 	@Override
+	public Boolean getBoolean(String column) {
+		return curRow.getBoolean(column);
+	}
+	
+	@Override
 	public java.time.LocalDate getDate(String column) {
 		return curRow.getLocalDate(column);
 	}

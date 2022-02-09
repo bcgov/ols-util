@@ -275,7 +275,15 @@ public class JsonRowReader implements RowReader {
 		}
 		return (String)(curRow.get(column));
 	}
-	
+
+	@Override
+	public Boolean getBoolean(String column) {
+		if(curRow == null) {
+			return null;
+		}
+		return (Boolean)(curRow.get(column));
+	}
+
 	@Override
 	public LocalDate getDate(String column) {
 		if(curRow == null) {

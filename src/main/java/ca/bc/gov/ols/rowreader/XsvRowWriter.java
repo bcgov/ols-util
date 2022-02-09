@@ -37,6 +37,7 @@ public class XsvRowWriter implements RowWriter  {
 	private CSVWriter csvWriter;
 	private List<String> schema;
 	private int writeCount = 0;
+	private String fileName;
 	private String[] data; // reusable row data storage
 
 	public XsvRowWriter(Writer writer, char separator, List<String> schema, boolean quotes) {
@@ -50,10 +51,12 @@ public class XsvRowWriter implements RowWriter  {
 
 	public XsvRowWriter(File file, char separator, List<String> schema, boolean quotes) {
 		logger.info("XsvRowWriter opened for file: {}", file);
+		fileName = file.getPath();
 		try {
 			construct(new BufferedWriter(new FileWriter(file)), separator, schema, quotes);
 		} catch(IOException ioe) {
 			logger.error("Unable to open XsvWriter for file: {}", file);
+			throw new RuntimeException(ioe);
 		}
 	}
 
@@ -88,7 +91,7 @@ public class XsvRowWriter implements RowWriter  {
 	@Override
 	public void close() {
 		try {
-			logger.info("XsvRowWriter closed after writing: {} records", writeCount);
+			logger.info("XsvRowWriter {} closed after writing: {} records", fileName == null ? "" : "for file: " + fileName, writeCount);
 			csvWriter.close();
 		} catch (IOException ioe) {
 			throw new RuntimeException(ioe);
