@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -46,14 +47,14 @@ public class XsvRowWriter implements RowWriter  {
 	
 	public XsvRowWriter(OutputStream out, char separator, List<String> schema, boolean quotes) {
 		logger.info("XsvRowWriter opened for OutputStream: {}", out);
-		construct(new BufferedWriter(new OutputStreamWriter(out)), separator, schema, quotes);
+		construct(new BufferedWriter(new OutputStreamWriter(out, StandardCharsets.UTF_8)), separator, schema, quotes);
 	}
 
 	public XsvRowWriter(File file, char separator, List<String> schema, boolean quotes) {
 		logger.info("XsvRowWriter opened for file: {}", file);
 		fileName = file.getPath();
 		try {
-			construct(new BufferedWriter(new FileWriter(file)), separator, schema, quotes);
+			construct(new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8)), separator, schema, quotes);
 		} catch(IOException ioe) {
 			logger.error("Unable to open XsvWriter for file: {}", file);
 			throw new RuntimeException(ioe);

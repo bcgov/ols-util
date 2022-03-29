@@ -20,7 +20,7 @@ import java.util.Iterator;
 
 import org.locationtech.jts.geom.GeometryFactory;
 
-public class CollectionRowReader<T> extends AbstractBasicRowReader {
+public class CollectionRowReader<T> extends AbstractBasicWktRowReader {
 
 	private Iterator<T> itemIterator;
 	

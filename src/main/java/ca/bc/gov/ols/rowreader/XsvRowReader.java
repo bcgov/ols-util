@@ -30,7 +30,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
-public abstract class XsvRowReader extends AbstractBasicRowReader implements RowReader {
+public abstract class XsvRowReader extends AbstractBasicWktRowReader implements RowReader {
 	private static final Logger logger = LoggerFactory.getLogger(XsvRowReader.class.getCanonicalName());
 
 	public static final String UTF8_BOM = "\uFEFF";

@@ -20,8 +20,10 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 /**
  * RowReader defines a generic interface similar to JDBC ResultSet, allowing for compatibility with
@@ -87,7 +89,6 @@ public interface RowReader extends AutoCloseable {
 	 */
 	public Boolean getBoolean(String column);
 	
-
 	/**
 	 * Returns the value of the specified column as a Date.
 	 * 
@@ -118,6 +119,49 @@ public interface RowReader extends AutoCloseable {
 	 * @return the linear geometry represented by this row of data
 	 */
 	public LineString getLineString();
+
+	/**
+	 * Returns a LineString object for the linear geometry represented by this row of data. Uses the
+	 * given column name to reference the geometry column.
+	 * 
+	 * @param column the name of the column to get the point from
+	 * @return the linear geometry represented by this row of data
+	 */
+	public LineString getLineString(String column);
+
+	/**
+	 * Returns a Polygon object for the polygonal geometry represented by this row of data. Uses the
+	 * default column name "wkt" to reference the geometry column.
+	 * 
+	 * @return the polygon geometry represented by this row of data
+	 */
+	public Polygon getPolygon();
+
+	/**
+	 * Returns a Polygon object for the polygonal geometry represented by this row of data. Uses the
+	 * given column name to reference the geometry column.
+	 * 
+	 * @param column the name of the column to get the point from
+	 * @return the polygon geometry represented by this row of data
+	 */
+	public Polygon getPolygon(String column);
+
+	/**
+	 * Returns a Geometry object for the geometry represented by this row of data. Uses the
+	 * default column name "wkt" to reference the geometry column.
+	 * 
+	 * @return the polygon geometry represented by this row of data
+	 */
+	public Geometry getGeometry();
+	
+	/**
+	 * Returns a Geometry object for the geometry represented by this row of data. Uses the
+	 * given column name to reference the geometry column.
+	 * 
+	 * @param column the name of the column to get the point from
+	 * @return the polygon geometry represented by this row of data
+	 */
+	public Geometry getGeometry(String column);
 	
 	/**
 	 * Returns the value of the specified column as a Uuid.
