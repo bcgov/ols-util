@@ -191,6 +191,7 @@
 			<version>${geotools.version}</version>
 		</dependency>
 	</dependencies>
+	<repositories>
 	  <repository>
 	    <id>osgeo</id>
 	    <name>OSGeo Release Repository</name>
@@ -205,4 +206,5 @@
 	    <snapshots><enabled>true</enabled></snapshots>
 	    <releases><enabled>false</enabled></releases>
 	  </repository>
+	</repositories>
 </project>
