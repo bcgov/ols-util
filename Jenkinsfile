@@ -28,17 +28,17 @@ node ('master'){
         buildInfo = Artifactory.newBuildInfo()
     }
 
-    stage('SonarQube Analysis') {
-        environment {
-           scannerHome = tool 'appqa'
-        }
-        withSonarQubeEnv('CODEQA') {
-	   env.JAVA_HOME = "${tool 'ojdk'}"
-           withMaven(maven:'m3') {
-              sh 'mvn clean package sonar:sonar -Dsonar.java.source=11'
-           }
-        }
-    }
+//     stage('SonarQube Analysis') {
+//         environment {
+//            scannerHome = tool 'appqa'
+//         }
+//         withSonarQubeEnv('CODEQA') {
+// 	   env.JAVA_HOME = "${tool 'ojdk'}"
+//            withMaven(maven:'m3') {
+//               sh 'mvn clean package sonar:sonar -Dsonar.java.source=11'
+//            }
+//         }
+//     }
 
     /* stage("Quality Gate") {
         steps {
