@@ -10,8 +10,11 @@ public class InMemoryConfigurationStore implements ConfigurationStore {
 
     @Override
     public Stream<ConfigurationParameter> getConfigParams() {
-        ConfigurationParameter cp = new ConfigurationParameter("BGEO", "dataSource.className", "ca.bc.gov.ols.datasources.TestDataSource");
-        return Stream.of(cp);
+        ConfigurationParameter cp1 = new ConfigurationParameter("BGEO", "dataSource.className", "ca.bc.gov.ols.geocoder.datasources.TestDataSource");
+        ConfigurationParameter cp2 = new ConfigurationParameter("BGEO", "baseSrsCode", "3005");
+        ConfigurationParameter cp3 = new ConfigurationParameter("BGEO", "baseSrsBounds", "200000,300000,1900000,1800000");
+
+        return Stream.of(cp1, cp2, cp3);
     }
 
     @Override
