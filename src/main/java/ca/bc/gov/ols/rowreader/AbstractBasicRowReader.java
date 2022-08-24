@@ -23,7 +23,7 @@ public abstract class AbstractBasicRowReader implements RowReader {
 		}
 		return Integer.valueOf(result.toString());
 	}
-	
+
 	@Override
 	public Integer getInteger(String column) {
 		Object result = getObject(column);
@@ -79,8 +79,8 @@ public abstract class AbstractBasicRowReader implements RowReader {
 			}
 		}
 		return null;
-	}
-	
+	}	
+
 	@Override
 	public LocalDate getDate(String column) {
 		Object result = getObject(column);
@@ -92,8 +92,8 @@ public abstract class AbstractBasicRowReader implements RowReader {
 			return LocalDate.parse(dateStr);
 		}
 		return DateTimeFormatter.BASIC_ISO_DATE.parse(dateStr, LocalDate::from);
-	}
-	
+	}	
+
 	@Override
 	public Point getPoint() {
 		return (Point)getGeometry();
@@ -106,7 +106,7 @@ public abstract class AbstractBasicRowReader implements RowReader {
 	
 	@Override
 	public LineString getLineString() {
-		return (LineString)getGeometry("wkt");
+		return (LineString)getGeometry(defaultGeometryColumn);
 	}
 
 	@Override
@@ -116,7 +116,7 @@ public abstract class AbstractBasicRowReader implements RowReader {
 	
 	@Override
 	public Polygon getPolygon() {
-		return (Polygon)getGeometry("wkt");
+		return (Polygon)getGeometry(defaultGeometryColumn);
 	}
 
 	@Override
@@ -126,7 +126,7 @@ public abstract class AbstractBasicRowReader implements RowReader {
 
 	@Override
 	public Geometry getGeometry() {
-		return getGeometry("wkt");
+		return getGeometry(defaultGeometryColumn);
 	}
 	
 }

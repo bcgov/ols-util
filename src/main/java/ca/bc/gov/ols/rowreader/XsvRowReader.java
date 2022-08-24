@@ -91,6 +91,11 @@ public abstract class XsvRowReader extends AbstractBasicWktRowReader implements 
 	}
 
 	@Override
+	public Point getPoint() {
+		return getPoint("");
+	}
+
+	@Override
 	public Point getPoint(String prefix) {
 		Object xObj = getObject(prefix + "x");
 		Object yObj = getObject(prefix + "y");
