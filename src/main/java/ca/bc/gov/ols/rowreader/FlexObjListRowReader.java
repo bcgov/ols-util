@@ -19,10 +19,9 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Iterator;
 
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Geometry;
 
-public class FlexObjListRowReader implements RowReader {
+public class FlexObjListRowReader extends AbstractBasicRowReader {
 	
 	private Collection<FlexObj> data;
 	private Iterator<FlexObj> iter = null;
@@ -30,6 +29,7 @@ public class FlexObjListRowReader implements RowReader {
 	
 	public FlexObjListRowReader(Collection<FlexObj> data) {
 		this.data = data;
+		defaultGeometryColumn = "geom";
 	}
 	
 	@Override
@@ -85,6 +85,14 @@ public class FlexObjListRowReader implements RowReader {
 	}
 	
 	@Override
+	public Boolean getBoolean(String column) {
+		if(curRow == null) {
+			return null;
+		}
+		return (Boolean)(curRow.get(column));
+	}
+	
+	@Override
 	public LocalDate getDate(String column) {
 		if(curRow == null) {
 			return null;
@@ -93,27 +101,11 @@ public class FlexObjListRowReader implements RowReader {
 	}
 	
 	@Override
-	public Point getPoint() {
+	public Geometry getGeometry(String column) {
 		if(curRow == null) {
 			return null;
 		}
-		return (Point)(curRow.get("geom"));
-	}
-	
-	@Override
-	public Point getPoint(String col) {
-		if(curRow == null) {
-			return null;
-		}
-		return (Point)(curRow.get(col));
-	}
-	
-	@Override
-	public LineString getLineString() {
-		if(curRow == null) {
-			return null;
-		}
-		return (LineString)(curRow.get("geom"));
+		return (Geometry)curRow.get(column);
 	}
 	
 	@Override

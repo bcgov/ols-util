@@ -21,6 +21,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 import org.locationtech.jts.geom.GeometryFactory;
 
@@ -31,6 +33,16 @@ public class CsvRowReader extends XsvRowReader {
 		this.fileName = fileName; 
 		try {
 			construct(new BufferedReader(new FileReader(fileName)), ',');
+		} catch(IOException ioe) {
+			throw new RuntimeException(ioe);
+		}
+	}
+	
+	public CsvRowReader(String fileName, GeometryFactory gf, Charset charset) {
+		super(gf);
+		this.fileName = fileName; 
+		try {
+			construct(new BufferedReader(new FileReader(fileName, charset)), ',');
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
 		}

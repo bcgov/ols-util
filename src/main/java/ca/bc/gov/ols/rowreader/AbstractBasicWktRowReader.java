@@ -16,45 +16,34 @@
 package ca.bc.gov.ols.rowreader;
 
 import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKTReader;
 
-public class MultiRowReader extends AbstractBasicRowReader {
+public abstract class AbstractBasicWktRowReader extends AbstractBasicRowReader {
+	public static final int NULL_INT_VALUE = Integer.MIN_VALUE;
+
+	protected GeometryFactory gf;
+	private WKTReader wktReader;
 	
-	private RowReader[] readers;
-	private int curReader = 0;
-	
-	public MultiRowReader(RowReader ... readers) {
-		this.readers = readers;
-	}
-
-	@Override
-	public boolean next() {
-		if(curReader >= readers.length) {
-			// all readers are exhausted
-			return false;
+	public AbstractBasicWktRowReader(GeometryFactory gf) {
+		this.gf = gf;
+		if(gf != null) {
+			wktReader = new WKTReader(gf);
 		}
-		if(readers[curReader].next()) {
-			// the current reader has more
-			return true;
-		}
-		// try the next reader in the list
-		curReader++;
-		return next();
 	}
-
-	@Override
-	public Object getObject(String column) {
-		return readers[curReader].getObject(column);
-	}
-
+			
 	@Override
 	public Geometry getGeometry(String column) {
-		return readers[curReader].getGeometry(column);
-	}
-
-	@Override
-	public void close() {
-		for(RowReader r : readers) {
-			r.close();
+		Object result = getObject(column);
+		if(result == null) {
+			return null;
+		}
+		try {
+			Geometry geom = wktReader.read(result.toString());
+			return geom;
+		} catch(ParseException pe) {
+			throw new RuntimeException("ParseException while parsing LineString WKB", pe);
 		}
 	}
 

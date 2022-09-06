@@ -29,9 +29,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
-import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +39,7 @@ import com.google.gson.stream.JsonToken;
 
 import gnu.trove.map.hash.THashMap;
 
-public class JsonRowReader implements RowReader {
+public class JsonRowReader extends AbstractBasicRowReader {
 	private static final Logger logger = LoggerFactory.getLogger(JsonRowReader.class.getCanonicalName());
 
 	private JsonReader jsonReader = null;
@@ -224,12 +223,12 @@ public class JsonRowReader implements RowReader {
 		if(curRow == null) {
 			return null;
 		}
-		return curRow.get(column);
+		return curRow.get(column.toLowerCase());
 	}
 	
 	private BigDecimal getNumber(String column) {
 		if(curRow == null) return null;
-		Object value = curRow.get(column);
+		Object value = curRow.get(column.toLowerCase());
 		if(value == null) return null;
 		if(value instanceof String) {
 			if(((String)value).isEmpty()) {
@@ -273,39 +272,32 @@ public class JsonRowReader implements RowReader {
 		if(curRow == null) {
 			return null;
 		}
-		return (String)(curRow.get(column));
+		return (String)(curRow.get(column.toLowerCase()));
 	}
-	
+
+	@Override
+	public Boolean getBoolean(String column) {
+		if(curRow == null) {
+			return null;
+		}
+		return (Boolean)(curRow.get(column.toLowerCase()));
+	}
+
 	@Override
 	public LocalDate getDate(String column) {
 		if(curRow == null) {
 			return null;
 		}
-		return (LocalDate)(curRow.get(column));
+		return (LocalDate)(curRow.get(column.toLowerCase()));
 	}
 	
 	@Override
-	public Point getPoint() {
+	public Geometry getGeometry(String column) {
 		if(curRow == null) {
 			return null;
 		}
-		return (Point)(curRow.get("geom"));
-	}
-	
-	@Override
-	public Point getPoint(String col) {
-		if(curRow == null) {
-			return null;
-		}
-		return (Point)(curRow.get(col));
-	}
-	
-	@Override
-	public LineString getLineString() {
-		if(curRow == null) {
-			return null;
-		}
-		return (LineString)(curRow.get("geom"));
+		// ignore column, only valid name is geom
+		return (Geometry)(curRow.get("geom"));
 	}
 	
 	public Map<String, String> getDates() {

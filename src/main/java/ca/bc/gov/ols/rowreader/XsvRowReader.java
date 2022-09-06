@@ -30,7 +30,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 
-public abstract class XsvRowReader extends AbstractBasicRowReader implements RowReader {
+public abstract class XsvRowReader extends AbstractBasicWktRowReader implements RowReader {
 	private static final Logger logger = LoggerFactory.getLogger(XsvRowReader.class.getCanonicalName());
 
 	public static final String UTF8_BOM = "\uFEFF";
@@ -91,6 +91,11 @@ public abstract class XsvRowReader extends AbstractBasicRowReader implements Row
 	}
 
 	@Override
+	public Point getPoint() {
+		return getPoint("");
+	}
+
+	@Override
 	public Point getPoint(String prefix) {
 		Object xObj = getObject(prefix + "x");
 		Object yObj = getObject(prefix + "y");
@@ -113,7 +118,7 @@ public abstract class XsvRowReader extends AbstractBasicRowReader implements Row
 	@Override
 	public void close() {
 		try {
-			logger.info("XsvRowReader closed after reading: {} records", readCount);
+			logger.info("XsvRowReader {} closed after reading: {} records", fileName == null ? "" : "for file: " + fileName, readCount);
 			reader.close();
 		} catch (IOException ioe) {
 			throw new RuntimeException(ioe);

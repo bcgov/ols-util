@@ -17,8 +17,10 @@ package ca.bc.gov.ols.rowreader;
 
 import java.util.Iterator;
 
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 import com.datastax.oss.driver.api.core.cql.ResultSet;
 import com.datastax.oss.driver.api.core.cql.Row;
@@ -70,6 +72,11 @@ public class DatastaxResultSetRowReader implements RowReader {
 	}
 	
 	@Override
+	public Boolean getBoolean(String column) {
+		return curRow.getBoolean(column);
+	}
+	
+	@Override
 	public java.time.LocalDate getDate(String column) {
 		return curRow.getLocalDate(column);
 	}
@@ -88,7 +95,32 @@ public class DatastaxResultSetRowReader implements RowReader {
 	public LineString getLineString() {
 			throw new UnsupportedOperationException("DatastacresultSetRowReader does not support getLineString()");
 	}
-	
+
+	@Override
+	public LineString getLineString(String column) {
+			throw new UnsupportedOperationException("DatastacresultSetRowReader does not support getLineString()");
+	}
+
+	@Override
+	public Polygon getPolygon() {
+			throw new UnsupportedOperationException("DatastacresultSetRowReader does not support getPolygon()");
+	}
+
+	@Override
+	public Polygon getPolygon(String column) {
+			throw new UnsupportedOperationException("DatastacresultSetRowReader does not support getPolygon()");
+	}
+
+	@Override
+	public Geometry getGeometry() {
+			throw new UnsupportedOperationException("DatastacresultSetRowReader does not support getGeometry()");
+	}
+
+	@Override
+	public Geometry getGeometry(String column) {
+			throw new UnsupportedOperationException("DatastacresultSetRowReader does not support getGeometry()");
+	}
+
 	@Override
 	public void close() {
 	}

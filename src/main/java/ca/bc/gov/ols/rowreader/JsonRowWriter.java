@@ -19,6 +19,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.text.DecimalFormat;
@@ -58,7 +59,7 @@ public class JsonRowWriter implements RowWriter {
 			Map<DateType, LocalDate> dates) {
 		try {
 			logger.info("JsonRowWriter opened for file: " + file.getCanonicalPath());
-			bw = new BufferedWriter(new FileWriter(file));
+			bw = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8));
 			jw = new JsonWriter(bw);
 			if(dates != null) {
 				withDates = true;

@@ -19,9 +19,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public enum DividerType {
-	NONE("n"),
-	SOFT("s"),
-	HARD("h");
+	NONE("N"),
+	SOFT("S"),
+	HARD("H");
 	
 	private static final Logger logger = LoggerFactory.getLogger(DividerType.class.getCanonicalName());
 	

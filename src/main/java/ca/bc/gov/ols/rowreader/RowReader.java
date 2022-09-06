@@ -15,13 +15,15 @@
  */
 package ca.bc.gov.ols.rowreader;
 
-import java.lang.reflect.Proxy;
 import java.time.LocalDate;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
+import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
+import org.locationtech.jts.geom.Polygon;
 
 /**
  * RowReader defines a generic interface similar to JDBC ResultSet, allowing for compatibility with
@@ -29,7 +31,7 @@ import org.locationtech.jts.geom.Point;
  * 
  * @author chodgson@refractions.net
  */
-public interface RowReader {
+public interface RowReader extends AutoCloseable {
 	static final int NULL_INT_VALUE = Integer.MIN_VALUE;
 
 	/**
@@ -80,6 +82,14 @@ public interface RowReader {
 	public String getString(String column);
 	
 	/**
+	 * Returns the value of the specified column as a Boolean.
+	 * 
+	 * @param column the name of the column whose value to return
+	 * @return the value of the specified column
+	 */
+	public Boolean getBoolean(String column);
+	
+	/**
 	 * Returns the value of the specified column as a Date.
 	 * 
 	 * @param column the name of the column whose value to return
@@ -109,17 +119,66 @@ public interface RowReader {
 	 * @return the linear geometry represented by this row of data
 	 */
 	public LineString getLineString();
+
+	/**
+	 * Returns a LineString object for the linear geometry represented by this row of data. Uses the
+	 * given column name to reference the geometry column.
+	 * 
+	 * @param column the name of the column to get the point from
+	 * @return the linear geometry represented by this row of data
+	 */
+	public LineString getLineString(String column);
+
+	/**
+	 * Returns a Polygon object for the polygonal geometry represented by this row of data. Uses the
+	 * default column name "wkt" to reference the geometry column.
+	 * 
+	 * @return the polygon geometry represented by this row of data
+	 */
+	public Polygon getPolygon();
+
+	/**
+	 * Returns a Polygon object for the polygonal geometry represented by this row of data. Uses the
+	 * given column name to reference the geometry column.
+	 * 
+	 * @param column the name of the column to get the point from
+	 * @return the polygon geometry represented by this row of data
+	 */
+	public Polygon getPolygon(String column);
+
+	/**
+	 * Returns a Geometry object for the geometry represented by this row of data. Uses the
+	 * default column name "wkt" to reference the geometry column.
+	 * 
+	 * @return the polygon geometry represented by this row of data
+	 */
+	public Geometry getGeometry();
 	
-	@SuppressWarnings("unchecked")
+	/**
+	 * Returns a Geometry object for the geometry represented by this row of data. Uses the
+	 * given column name to reference the geometry column.
+	 * 
+	 * @param column the name of the column to get the point from
+	 * @return the polygon geometry represented by this row of data
+	 */
+	public Geometry getGeometry(String column);
+	
+	/**
+	 * Returns the value of the specified column as a Uuid.
+	 * 
+	 * @param column the name of the column whose value to return
+	 * @return the linear geometry represented by this row of data
+	 */
+	public default UUID getUuid(String column) {
+		String s = getString(column);
+		if(s == null) return null;
+		return UUID.fromString(s);
+	}
+	
 	default public <T> Stream<T> asStream(Function<RowReader, T> mappingFunction) {
 		return Stream.generate(() -> null)
 				.takeWhile(x -> this.next())
 				.map(n -> mappingFunction.apply(this));
-//		final RowReaderStreamInvocationHandler<T> handler = 
-//				new RowReaderStreamInvocationHandler<T>(this, mappingFunction);
-//		Stream<T> proxy = (Stream<T>) Proxy.newProxyInstance(getClass().getClassLoader(),
-//				new Class<?>[] { Stream.class }, handler);
-//		return proxy;
 	}
 	
 	/**
@@ -127,5 +186,5 @@ public interface RowReader {
 	 * etc.) associated with it.
 	 */
 	public void close();
-	
+
 }
