@@ -20,16 +20,11 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.text.DecimalFormat;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Map.Entry;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import com.google.gson.stream.JsonWriter;
 
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.Geometry;
@@ -37,12 +32,16 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.MultiPolygon;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.google.gson.stream.JsonWriter;
 
 public class JsonRowWriter implements RowWriter {
 	private static final Logger logger = LoggerFactory.getLogger(JsonRowWriter.class.getCanonicalName());
 	
-	static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
-
+	public static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssX");
+	
 	static final DecimalFormat DEGREE_FORMAT = new DecimalFormat("###.#####");
 	static final DecimalFormat METRE_FORMAT = new DecimalFormat("###.##");
 	
@@ -56,7 +55,7 @@ public class JsonRowWriter implements RowWriter {
 	}
 
 	public JsonRowWriter(File file, String name,
-			Map<DateType, LocalDate> dates) {
+			Map<String, String> dates) {
 		try {
 			logger.info("JsonRowWriter opened for file: " + file.getCanonicalPath());
 			bw = new BufferedWriter(new FileWriter(file, StandardCharsets.UTF_8));
@@ -72,7 +71,7 @@ public class JsonRowWriter implements RowWriter {
 							jw.name("type").value("name");
 							jw.name("properties");
 							jw.beginObject();
-								jw.name("name").value("EPSG:3005");
+							jw.name("name").value("EPSG:3005");
 							jw.endObject();
 						jw.endObject();
 						jw.name("features");
@@ -83,8 +82,8 @@ public class JsonRowWriter implements RowWriter {
 							jw.name("geometry").nullValue();
 							jw.name("properties");
 							jw.beginObject();
-							for(Entry<DateType, LocalDate> dateEntry: dates.entrySet()) {
-								jw.name(dateEntry.getKey().name()).value(dateEntry.getValue().format(DATE_FORMATTER));
+							for(Entry<String, String> dateEntry: dates.entrySet()) {
+								jw.name(dateEntry.getKey()).value(dateEntry.getValue());
 							}
 							jw.endObject();
 							jw.endObject();
