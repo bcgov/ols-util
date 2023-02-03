@@ -13,6 +13,7 @@ public enum SurfaceType {
 	LOOSE("L"),
 	OVERGROWN("O"),
 	PAVED("P"),
+	REHABILITATED("H"),
 	ROUGH("R"),
 	SEASONAL("S"),
 	UNKNOWN("U");
