@@ -67,7 +67,6 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<springframework.version>6.0.9</springframework.version>
 		<geotools.version>26.3</geotools.version>
 		<slf4j.version>2.0.4</slf4j.version>
 		<trove4j.version>3.0.3</trove4j.version>
@@ -181,11 +180,6 @@
 			<groupId>com.datastax.oss</groupId>
 			<artifactId>java-driver-mapper-runtime</artifactId>
 			<version>4.1.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>${springframework.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>

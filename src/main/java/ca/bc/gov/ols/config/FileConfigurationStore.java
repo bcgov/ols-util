@@ -58,6 +58,7 @@ public class FileConfigurationStore implements ConfigurationStore {
 		if(!baseUrl.endsWith("/")) {
 			baseUrl = baseUrl.concat("/");
 		}
+		logger.info("FileConfigurationStore started using location: {}", baseUrl);
 		validate();
 	}
 	
