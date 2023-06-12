@@ -33,38 +33,6 @@
 		<url>https://github.com/bcgov/ols-util</url>
 	</scm>
 
-	<issueManagement>
-		<system>github.com</system>
-		<url>https://github.com/bcgov/ols-util/issues</url>
-	</issueManagement>
-
-	<developers>
-		<developer>
-			<name>Chris Hodgson</name>
-			<email>chodgson@refractions.net</email>
-			<organization>Refractions Research Inc.</organization>
-			<organizationUrl>http://www.refractions.net/</organizationUrl>
-			<timezone>PST</timezone>
-		</developer>
-	</developers>
-
-	<contributors>
-		<contributor>
-			<name>Michael Ross</name>
-			<email>Michael.RA.Ross@gov.bc.ca</email>
-			<organization>Province of British Columbia</organization>
-			<organizationUrl>https://www.gov.bc.ca</organizationUrl>
-			<timezone>PST</timezone>
-		</contributor>
-		<contributor>
-			<name>Brian Kelsey</name>
-			<email>Brian.Kelsey@gov.bc.ca</email>
-			<organization>Province of British Columbia</organization>
-			<organizationUrl>https://www.gov.bc.ca</organizationUrl>
-			<timezone>PST</timezone>
-		</contributor>
-	</contributors>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<geotools.version>26.3</geotools.version>
@@ -187,6 +155,7 @@
 			<version>${geotools.version}</version>
 		</dependency>
 	</dependencies>
+	
 	<repositories>
 	  <repository>
 	     <id>osgeo</id>
@@ -196,16 +165,5 @@
 	     <releases><enabled>true</enabled></releases>
 	  </repository>
 	</repositories>
-	<distributionManagement>
-		<repository>
-			<id>central</id>
-			<name>artifactory-ha-primary-0-releases</name>
-			<url>https://artifacts.developer.gov.bc.ca/artifactory/g988-release</url>
-		</repository>
-			<snapshotRepository>
-			<id>snapshots</id>
-			<name>artifactory-ha-primary-0-snapshots</name>
-			<url>https://artifacts.developer.gov.bc.ca/artifactory/g988-snapshot</url>
-		</snapshotRepository>
-	</distributionManagement>
+
 </project>
