@@ -34,6 +34,8 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
@@ -46,6 +48,7 @@ public class JsonRowReader extends AbstractBasicRowReader {
 	private GeometryFactory gf = null;
 	private Map<String,Object> curRow = null;
 	private int readCount = 0;
+	private Gson gson = new Gson();
 	ArrayList<Coordinate> coordBuffer = new ArrayList<Coordinate>(1000);
 	private Map<String,String> dates = new HashMap<String,String>();
 	
@@ -197,6 +200,9 @@ public class JsonRowReader extends AbstractBasicRowReader {
 					        	jsonReader.nextNull();
 					            curRow.put(name, null);
 					            break;
+					        case BEGIN_OBJECT:
+					        	curRow.put(name, gson.fromJson(jsonReader, JsonObject.class));
+					        	break;
 							default:
 								jsonReader.skipValue();
 							}
@@ -273,6 +279,14 @@ public class JsonRowReader extends AbstractBasicRowReader {
 			return null;
 		}
 		return (String)(curRow.get(column.toLowerCase()));
+	}
+
+	@Override
+	public JsonObject getJson(String column) {
+		if(curRow == null) {
+			return null;
+		}
+		return (JsonObject)(curRow.get(column.toLowerCase()));
 	}
 
 	@Override

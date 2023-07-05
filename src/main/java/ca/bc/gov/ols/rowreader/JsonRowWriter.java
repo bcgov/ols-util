@@ -21,7 +21,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -35,6 +34,8 @@ import org.locationtech.jts.geom.Polygon;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonWriter;
 
 public class JsonRowWriter implements RowWriter {
@@ -48,6 +49,7 @@ public class JsonRowWriter implements RowWriter {
 	private boolean withDates = false;
 	private JsonWriter jw;
 	private BufferedWriter bw;
+	private Gson gson = new Gson();
 	private int writeCount = 0;
 
 	public JsonRowWriter(File file, String name) {
@@ -139,6 +141,8 @@ public class JsonRowWriter implements RowWriter {
 						jw.value(((Double)val).doubleValue());
 					} else if(val instanceof Boolean) {
 						jw.value(((Boolean)val).booleanValue());
+					} else if(val instanceof JsonObject) {
+						gson.toJson(((JsonObject)val), jw);
 					} else {
 						jw.value(val.toString());
 					}
