@@ -7,7 +7,7 @@
 
 	<groupId>ca.bc.gov.ols</groupId>
 	<artifactId>ols-util</artifactId>
-	<version>1.3.1-SNAPSHOT</version>
+	<version>1.3.2-SNAPSHOT</version>
 	<inceptionYear>2008</inceptionYear>
 	<packaging>jar</packaging>
 
@@ -33,42 +33,11 @@
 		<url>https://github.com/bcgov/ols-util</url>
 	</scm>
 
-	<issueManagement>
-		<system>github.com</system>
-		<url>https://github.com/bcgov/ols-util/issues</url>
-	</issueManagement>
-
-	<developers>
-		<developer>
-			<name>Chris Hodgson</name>
-			<email>chodgson@refractions.net</email>
-			<organization>Refractions Research Inc.</organization>
-			<organizationUrl>http://www.refractions.net/</organizationUrl>
-			<timezone>PST</timezone>
-		</developer>
-	</developers>
-
-	<contributors>
-		<contributor>
-			<name>Michael Ross</name>
-			<email>Michael.RA.Ross@gov.bc.ca</email>
-			<organization>Province of British Columbia</organization>
-			<organizationUrl>https://www.gov.bc.ca</organizationUrl>
-			<timezone>PST</timezone>
-		</contributor>
-		<contributor>
-			<name>Brian Kelsey</name>
-			<email>Brian.Kelsey@gov.bc.ca</email>
-			<organization>Province of British Columbia</organization>
-			<organizationUrl>https://www.gov.bc.ca</organizationUrl>
-			<timezone>PST</timezone>
-		</contributor>
-	</contributors>
-
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<springframework.version>5.1.3.RELEASE</springframework.version>
 		<geotools.version>26.3</geotools.version>
+		<slf4j.version>2.0.4</slf4j.version>
+		<trove4j.version>3.0.3</trove4j.version>
 	</properties>
 
 	<build>
@@ -76,15 +45,15 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
+				<version>3.11.0</version>
 				<configuration>
-					<release>11</release>
+					<release>17</release>
 				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-source-plugin</artifactId>
-				<version>2.1.2</version>
+				<version>3.2.1</version>
 				<configuration>
 					<includePom>true</includePom>
 				</configuration>
@@ -101,7 +70,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.0.1</version>
+				<version>3.5.0</version>
 				<executions>
 					<execution>
 						<id>javadoc-html</id>
@@ -163,12 +132,12 @@
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-api</artifactId>
-			<version>1.7.26</version>
+			<version>${slf4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>net.sf.trove4j</groupId>
 			<artifactId>trove4j</artifactId>
-			<version>3.0.3</version>
+			<version>${trove4j.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>com.datastax.oss</groupId>
@@ -181,16 +150,12 @@
 			<version>4.1.0</version>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework</groupId>
-			<artifactId>spring-web</artifactId>
-			<version>${springframework.version}</version>
-		</dependency>
-		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-shapefile</artifactId>
 			<version>${geotools.version}</version>
 		</dependency>
 	</dependencies>
+	
 	<repositories>
 	  <repository>
 	     <id>osgeo</id>
@@ -200,16 +165,5 @@
 	     <releases><enabled>true</enabled></releases>
 	  </repository>
 	</repositories>
-	<distributionManagement>
-		<repository>
-			<id>central</id>
-			<name>artifactory-ha-primary-0-releases</name>
-			<url>https://artifacts.developer.gov.bc.ca/artifactory/g988-release</url>
-		</repository>
-			<snapshotRepository>
-			<id>snapshots</id>
-			<name>artifactory-ha-primary-0-snapshots</name>
-			<url>https://artifacts.developer.gov.bc.ca/artifactory/g988-snapshot</url>
-		</snapshotRepository>
-	</distributionManagement>
+
 </project>
