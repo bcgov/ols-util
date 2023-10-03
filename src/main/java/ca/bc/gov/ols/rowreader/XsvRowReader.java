@@ -15,20 +15,19 @@
  */
 package ca.bc.gov.ols.rowreader;
 
-import gnu.trove.map.hash.THashMap;
-
 import java.io.IOException;
 import java.io.Reader;
+import java.util.List;
 import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import au.com.bytecode.opencsv.CSVReader;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import au.com.bytecode.opencsv.CSVReader;
+import gnu.trove.map.hash.THashMap;
 
 public abstract class XsvRowReader extends AbstractBasicWktRowReader implements RowReader {
 	private static final Logger logger = LoggerFactory.getLogger(XsvRowReader.class.getCanonicalName());
@@ -77,6 +76,16 @@ public abstract class XsvRowReader extends AbstractBasicWktRowReader implements 
 		return false;
 	}
 
+	/**
+	 * Returns a list of the columns, in the file-specified order
+	 * @return a list of the columns, in the file-specified order
+	 */
+	public List<String> getSchema() {
+		String[] columns = new String[schema.size()];
+		schema.forEach((s,i) -> columns[i] = s);
+		return List.of(columns);
+	}
+	
 	@Override
 	public Object getObject(String column) {
 		Integer colNum = schema.get(column.toLowerCase());

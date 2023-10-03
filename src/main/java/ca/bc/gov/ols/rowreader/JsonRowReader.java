@@ -34,6 +34,8 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonToken;
 
@@ -46,7 +48,8 @@ public class JsonRowReader extends AbstractBasicRowReader {
 	private GeometryFactory gf = null;
 	private Map<String,Object> curRow = null;
 	private int readCount = 0;
-	ArrayList<Coordinate> coordBuffer = new ArrayList<Coordinate>(1000);
+	private Gson gson = new Gson();
+	static ArrayList<Coordinate> coordBuffer = new ArrayList<Coordinate>(1000);
 	private Map<String,String> dates = new HashMap<String,String>();
 	
 	
@@ -129,55 +132,7 @@ public class JsonRowReader extends AbstractBasicRowReader {
 				while(jsonReader.hasNext()) {
 					switch(jsonReader.nextName()) {
 					case "geometry":
-						JsonToken tok = jsonReader.peek();
-						if(tok.equals(JsonToken.NULL)) {
-							jsonReader.nextNull();
-							curRow.put("geom", null);
-							break;
-						}
-						jsonReader.beginObject();
-						String type = null;
-						while(jsonReader.hasNext()) {
-							double x;
-							double y;
-							switch(jsonReader.nextName()) {
-							case "type":
-								type = jsonReader.nextString();
-								break;
-							case "coordinates":
-								if(type == null) {
-									throw new RuntimeException("GeoJSON geometry type must come before coordinates.");
-								}
-								switch(type) {
-								case "Point":
-									jsonReader.beginArray();
-									x = jsonReader.nextDouble();
-									y = jsonReader.nextDouble();
-									jsonReader.endArray();
-									curRow.put("geom", gf.createPoint(new Coordinate(x,y)));
-									break;
-								case "LineString":
-									coordBuffer.clear();
-									jsonReader.beginArray();
-									while(jsonReader.hasNext()) {
-										jsonReader.beginArray();
-										x = jsonReader.nextDouble();
-										y = jsonReader.nextDouble();
-										coordBuffer.add(new Coordinate(x,y));
-										jsonReader.endArray();
-									}
-									jsonReader.endArray();
-									curRow.put("geom", gf.createLineString(coordBuffer.toArray(new Coordinate[coordBuffer.size()])));
-									break;
-								default:
-									throw new RuntimeException("Unsupported GeoJSON geometry type: " + type );
-								}
-								break;
-							default:
-								jsonReader.skipValue();
-							}
-						}
-						jsonReader.endObject();
+						curRow.put("geom", parseJsonGeometry(jsonReader, gf));
 						break;
 					case "properties":
 						jsonReader.beginObject();
@@ -197,6 +152,9 @@ public class JsonRowReader extends AbstractBasicRowReader {
 					        	jsonReader.nextNull();
 					            curRow.put(name, null);
 					            break;
+					        case BEGIN_OBJECT:
+					        	curRow.put(name, gson.fromJson(jsonReader, JsonObject.class));
+					        	break;
 							default:
 								jsonReader.skipValue();
 							}
@@ -216,6 +174,59 @@ public class JsonRowReader extends AbstractBasicRowReader {
 		} catch(IOException ioe) {
 			throw new RuntimeException(ioe);
 		}
+	}
+	
+	public static Geometry parseJsonGeometry(JsonReader jsonReader, GeometryFactory gf) throws IOException {
+		JsonToken tok = jsonReader.peek();
+		if(tok.equals(JsonToken.NULL)) {
+			jsonReader.nextNull();
+			return null;
+		}
+		Geometry geom = null;
+		jsonReader.beginObject();
+		String type = null;
+		while(jsonReader.hasNext()) {
+			double x;
+			double y;
+			switch(jsonReader.nextName()) {
+			case "type":
+				type = jsonReader.nextString();
+				break;
+			case "coordinates":
+				if(type == null) {
+					throw new RuntimeException("GeoJSON geometry type must come before coordinates.");
+				}
+				switch(type) {
+				case "Point":
+					jsonReader.beginArray();
+					x = jsonReader.nextDouble();
+					y = jsonReader.nextDouble();
+					jsonReader.endArray();
+					geom =  gf.createPoint(new Coordinate(x,y));
+					break;
+				case "LineString":
+					coordBuffer.clear();
+					jsonReader.beginArray();
+					while(jsonReader.hasNext()) {
+						jsonReader.beginArray();
+						x = jsonReader.nextDouble();
+						y = jsonReader.nextDouble();
+						coordBuffer.add(new Coordinate(x,y));
+						jsonReader.endArray();
+					}
+					jsonReader.endArray();
+					geom = gf.createLineString(coordBuffer.toArray(new Coordinate[coordBuffer.size()]));
+					break;
+				default:
+					throw new RuntimeException("Unsupported GeoJSON geometry type: " + type );
+				}
+				break;
+			default:
+				jsonReader.skipValue();
+			}
+		}
+		jsonReader.endObject();
+		return geom;
 	}
 	
 	@Override
@@ -273,6 +284,14 @@ public class JsonRowReader extends AbstractBasicRowReader {
 			return null;
 		}
 		return (String)(curRow.get(column.toLowerCase()));
+	}
+
+	@Override
+	public JsonObject getJson(String column) {
+		if(curRow == null) {
+			return null;
+		}
+		return (JsonObject)(curRow.get(column.toLowerCase()));
 	}
 
 	@Override

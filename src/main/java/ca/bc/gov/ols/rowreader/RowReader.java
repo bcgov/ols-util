@@ -25,6 +25,9 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.Polygon;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 /**
  * RowReader defines a generic interface similar to JDBC ResultSet, allowing for compatibility with
  * other tabular data sources.
@@ -80,6 +83,20 @@ public interface RowReader extends AutoCloseable {
 	 * @return the value of the specified column
 	 */
 	public String getString(String column);
+	
+	/**
+	 * Returns the value of the specified column as a JsonElement.
+	 * 
+	 * @param column the name of the column whose value to return
+	 * @return the value of the specified column
+	 */
+	default public JsonObject getJson(String column) {
+		Object result = getObject(column);
+		if(result == null) {
+			return null;
+		}
+		return (JsonObject)JsonParser.parseString(result.toString());
+	}
 	
 	/**
 	 * Returns the value of the specified column as a Boolean.
