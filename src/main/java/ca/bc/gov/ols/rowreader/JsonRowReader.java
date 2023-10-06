@@ -295,14 +295,6 @@ public class JsonRowReader extends AbstractBasicRowReader {
 	}
 
 	@Override
-	public Boolean getBoolean(String column) {
-		if(curRow == null) {
-			return null;
-		}
-		return (Boolean)(curRow.get(column.toLowerCase()));
-	}
-
-	@Override
 	public LocalDate getDate(String column) {
 		if(curRow == null) {
 			return null;

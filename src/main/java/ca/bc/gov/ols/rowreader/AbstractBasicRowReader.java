@@ -70,13 +70,15 @@ public abstract class AbstractBasicRowReader implements RowReader {
 					|| "1".equals(str)) {
 				return Boolean.TRUE;
 			}
-		} else if(result instanceof Integer) {
-			int i = (Integer)result;
+		} else if(result instanceof Number) {
+			int i = ((Number)result).intValue();
 			if(i == 0) {
 				return Boolean.FALSE;
 			} else if(i == 1) {
 				return Boolean.TRUE;
 			}
+		} else if(result instanceof Boolean) {
+			return (Boolean)result;
 		}
 		return null;
 	}	
