@@ -29,13 +29,15 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.bytecode.opencsv.CSVWriter;
+import com.opencsv.CSVWriter;
+import com.opencsv.CSVWriterBuilder;
+import com.opencsv.ICSVWriter;
 
 
 public class XsvRowWriter implements RowWriter  {
 	private static final Logger logger = LoggerFactory.getLogger(XsvRowWriter.class.getCanonicalName());
 
-	private CSVWriter csvWriter;
+	private ICSVWriter csvWriter;
 	private List<String> schema;
 	private int writeCount = 0;
 	private String fileName;
@@ -63,9 +65,9 @@ public class XsvRowWriter implements RowWriter  {
 
 	private void construct(Writer writer, char separator, List<String> schema, boolean quotes) {
 		if(quotes) {
-			csvWriter = new CSVWriter(writer, separator);
+			csvWriter = new CSVWriterBuilder(writer).withSeparator(separator).build();
 		} else {
-			csvWriter = new CSVWriter(writer, separator, CSVWriter.NO_QUOTE_CHARACTER);
+			csvWriter = new CSVWriterBuilder(writer).withSeparator(separator).withQuoteChar(CSVWriter.NO_QUOTE_CHARACTER).build();
 		}
 		// write header line
 		csvWriter.writeNext(schema.toArray(new String[schema.size()]));

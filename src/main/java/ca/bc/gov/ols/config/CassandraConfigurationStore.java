@@ -42,7 +42,9 @@ import com.datastax.oss.driver.api.core.cql.SimpleStatement;
 import com.datastax.oss.driver.api.core.metadata.schema.KeyspaceMetadata;
 import com.datastax.oss.driver.api.core.metadata.schema.TableMetadata;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+
 import ca.bc.gov.ols.rowreader.DatastaxResultSetRowReader;
 
 public class CassandraConfigurationStore implements ConfigurationStore {
@@ -174,8 +176,8 @@ public class CassandraConfigurationStore implements ConfigurationStore {
 				session.execute(pStatement.bind(row[appIdIdx], row[nameIdx], row[valueIdx]));
 			}
 			reader.close();
-		} catch (IOException ioe) {
-			throw new RuntimeException(ioe);
+		} catch (IOException | CsvValidationException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 

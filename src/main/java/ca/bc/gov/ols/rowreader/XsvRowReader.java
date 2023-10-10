@@ -26,7 +26,12 @@ import org.locationtech.jts.geom.Point;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import au.com.bytecode.opencsv.CSVReader;
+import com.opencsv.CSVParser;
+import com.opencsv.CSVParserBuilder;
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvValidationException;
+
 import gnu.trove.map.hash.THashMap;
 
 public abstract class XsvRowReader extends AbstractBasicWktRowReader implements RowReader {
@@ -46,7 +51,8 @@ public abstract class XsvRowReader extends AbstractBasicWktRowReader implements 
 	protected void construct(Reader inReader, char separator) {
 		schema = new THashMap<String,Integer>();
 		try {
-			reader = new CSVReader(inReader, separator);
+			CSVParser parser = new CSVParserBuilder().withSeparator(separator).build();
+			reader = new CSVReaderBuilder(inReader).withCSVParser(parser).build();
 			String[] header = reader.readNext(); 
 			if(header == null) {
 				throw new RuntimeException("XSV file empty: " + fileName);
@@ -57,23 +63,36 @@ public abstract class XsvRowReader extends AbstractBasicWktRowReader implements 
 				}
 				schema.put(header[i].trim().toLowerCase(),i);
 			}
-		} catch(IOException ioe) {
-			throw new RuntimeException(ioe);
+		} catch(IOException | CsvValidationException ex) {
+			throw new RuntimeException(ex);
 		}
 	}
 
 	@Override
 	public boolean next() {
 		try {
-			nextLine = reader.readNext();
-			if(nextLine != null) {
-				readCount++;
-				return true;
+			// loop until we get a non-empty line or hit the end of the file
+			nonempty:
+			while(true) {
+				// get the next line
+				nextLine = reader.readNext();
+				// if it is null we are at end, return false
+				if(nextLine == null) return false;
+				// check if it is an array of null or empty strings
+				for(String entry : nextLine) {
+					if(entry != null && !entry.isBlank()) {
+						// not an empty line so bail out
+						break nonempty;
+					}
+				}
+				// if we get here it is an empty line so we will loop and get the next line 
 			}
-		} catch (IOException ioe) {
-			throw new RuntimeException(ioe);
+			// only count the non-empty lines
+			readCount++;
+			return true;
+		} catch (IOException | CsvValidationException ex) {
+			throw new RuntimeException(ex);
 		}
-		return false;
 	}
 
 	/**
