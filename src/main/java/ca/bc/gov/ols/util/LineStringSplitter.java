@@ -15,6 +15,7 @@
  */
 package ca.bc.gov.ols.util;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +28,64 @@ import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.operation.distance.DistanceOp;
 
 public class LineStringSplitter {
+	
+	/**
+	 * Splits the lineString into as many new lineStrings as needed so that the closest
+	 * point on the resulting lineStrings to each of the input points is at an end-point
+	 * or new split point. The number of splits of the linestring will no necessarily match
+	 * the number of input points, eg. if any points are equal to each other, or at either
+	 * end of the lineString. The input lineString will not be altered.
+	 * 
+	 * @param lineString the lineString to split
+	 * @param points the points where to split the lineString
+	 * @param projectedPoints an empty List that will be populated with the Projected point location for each input Point 
+	 * @return
+	 */
+	public static List<LineString> split(LineString lineString, List<Point> points, List<Point> projectedPoints) {
+		if(!projectedPoints.isEmpty()) throw new IllegalArgumentException("projectedPoints must be empty, was: " + projectedPoints.toString());
+		List<LineString> lines = new ArrayList<>();
+		lines.add(lineString);
+		// for each input point
+		for(Point p : points) {
+			int closestLineIndex = -1;
+			double closestDist = Double.POSITIVE_INFINITY;
+			Coordinate closestCoord = null;
+			// find the closest lineSegment (list will grow as we split)
+			for(int lineIndex = 0; lineIndex < lines.size(); lineIndex++) {
+				DistanceOp distOp = new DistanceOp(lines.get(lineIndex), p);
+				double dist = distOp.distance();
+				if(dist < closestDist) {
+					closestDist = dist;
+					closestLineIndex = lineIndex;
+					closestCoord = distOp.nearestLocations()[0].getCoordinate();					
+				}
+			}
+			// note that the closestCoord may have its coordinates rounded when made into a LineString
+			// because the LineString factory has a fixed precision model while nearestLocations() function
+			// uses the floating precisionModel of the input points
+			// we need the returned projectedPoints to exactly match the lineString start/end points.
+			Point projectedPoint;
+			
+			// if the point is not at the end of the closest line
+			LineString line = lines.get(closestLineIndex);
+			if(closestCoord.equals(line.getStartPoint().getCoordinate())) {
+				projectedPoint = line.getStartPoint();				
+			} else if(closestCoord.equals(line.getEndPoint().getCoordinate())) {
+				projectedPoint = line.getEndPoint();
+			} else {
+				// split the closest linestring
+				LineString[] newLineStrings = splitLineString(line, closestCoord);
+				lines.remove(closestLineIndex);
+				lines.add(closestLineIndex, newLineStrings[1]);
+				lines.add(closestLineIndex, newLineStrings[0]);
+				projectedPoint = newLineStrings[0].getEndPoint();				
+			}
+			projectedPoints.add(projectedPoint);
+		}
+		
+		return lines;
+	}
+	
 	/**
 	 * Splits the lineString at the point closest to the target. If the closest point 
 	 * on the linestring is at either end, the corresponding returned linestring will
