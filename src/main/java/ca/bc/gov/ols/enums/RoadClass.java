@@ -24,6 +24,7 @@ public enum RoadClass {
 	ARTERIAL_MINOR("arterial_minor", "RA2", true, 2),
 	COLLECTOR_MAJOR("collector_major", "RC1", true, 2),
 	COLLECTOR_MINOR("collector_minor", "RC2", true, 2),
+	CONTROLLED("controlled", "RCT", false, 1),
 	DRIVEWAY("driveway", "RPD", true, 1),
 	FERRY("ferry", "F", true, 0),
 	FERRY_PASSENGER("ferry_passenger", "FP", false, 0),
