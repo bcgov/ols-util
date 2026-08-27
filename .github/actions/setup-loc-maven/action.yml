@@ -1,0 +1,56 @@
+name: Set up LOC Maven access
+author: cditcher
+description: Configure Maven to resolve LOC dependencies through BC Gov Artifactory
+
+inputs:
+  artifactory-username:
+    description: Username for the read-only LOC Artifactory account
+    required: true
+
+  artifactory-password:
+    description: Password or token for the read-only LOC Artifactory account
+    required: true
+
+outputs:
+  settings-path:
+    description: Path to the generated Maven settings file
+    value: ${{ steps.configure.outputs.settings-path }}
+
+runs:
+  using: composite
+
+  steps:
+    - name: Configure Maven settings
+      id: configure
+      shell: bash
+      env:
+        LOC_USERNAME_INPUT: ${{ inputs.artifactory-username }}
+        LOC_PASSWORD_INPUT: ${{ inputs.artifactory-password }}
+        LOC_SETTINGS_TEMPLATE: ${{ github.action_path }}/settings.xml
+      run: |
+        if [[ -z "$LOC_USERNAME_INPUT" ]]; then
+          echo "LOC Artifactory username was not provided." >&2
+          exit 1
+        fi
+
+        if [[ -z "$LOC_PASSWORD_INPUT" ]]; then
+          echo "LOC Artifactory password was not provided." >&2
+          exit 1
+        fi
+
+        echo "::add-mask::$LOC_USERNAME_INPUT"
+        echo "::add-mask::$LOC_PASSWORD_INPUT"
+
+        maven_directory="${HOME}/.m2"
+        settings_path="${maven_directory}/settings.xml"
+
+        mkdir -p "$maven_directory"
+        cp "$LOC_SETTINGS_TEMPLATE" "$settings_path"
+        chmod 600 "$settings_path"
+
+        {
+          echo "LOC_ARTIFACTORY_USERNAME=$LOC_USERNAME_INPUT"
+          echo "LOC_ARTIFACTORY_PASSWORD=$LOC_PASSWORD_INPUT"
+        } >> "$GITHUB_ENV"
+
+        echo "settings-path=$settings_path" >> "$GITHUB_OUTPUT"
