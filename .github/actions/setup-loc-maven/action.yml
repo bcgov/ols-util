@@ -28,6 +28,9 @@ runs:
         LOC_PASSWORD_INPUT: ${{ inputs.artifactory-password }}
         LOC_SETTINGS_TEMPLATE: ${{ github.action_path }}/settings.xml
       run: |
+        echo "::add-mask::$LOC_USERNAME_INPUT"
+        echo "::add-mask::$LOC_PASSWORD_INPUT"
+        
         if [[ -z "$LOC_USERNAME_INPUT" ]]; then
           echo "LOC Artifactory username was not provided." >&2
           exit 1
@@ -37,9 +40,6 @@ runs:
           echo "LOC Artifactory password was not provided." >&2
           exit 1
         fi
-
-        echo "::add-mask::$LOC_USERNAME_INPUT"
-        echo "::add-mask::$LOC_PASSWORD_INPUT"
 
         maven_directory="${HOME}/.m2"
         settings_path="${maven_directory}/settings.xml"
