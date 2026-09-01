@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settings
+        xmlns="http://maven.apache.org/SETTINGS/1.2.0"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="
+      http://maven.apache.org/SETTINGS/1.2.0
+      https://maven.apache.org/xsd/settings-1.2.0.xsd">
+
+    <mirrors>
+        <mirror>
+            <id>loc-artifactory</id>
+            <name>LOC Artifactory Maven Virtual Repository</name>
+            <url>https://artifacts.developer.gov.bc.ca/artifactory/g988-libs</url>
+            <mirrorOf>*</mirrorOf>
+        </mirror>
+    </mirrors>
+
+    <servers>
+        <server>
+            <id>loc-artifactory</id>
+            <username>${env.LOC_ARTIFACTORY_USERNAME}</username>
+            <password>${env.LOC_ARTIFACTORY_PASSWORD}</password>
+        </server>
+    </servers>
+
+    <profiles>
+        <profile>
+            <id>loc-artifactory</id>
+
+            <repositories>
+                <repository>
+                    <id>loc-artifactory-source</id>
+                    <name>LOC Artifactory Maven Repository</name>
+                    <url>https://artifacts.developer.gov.bc.ca/artifactory/g988-libs</url>
+
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
+                    </releases>
+
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </repository>
+            </repositories>
+
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>loc-artifactory-plugin-source</id>
+                    <name>LOC Artifactory Maven Plugin Repository</name>
+                    <url>https://artifacts.developer.gov.bc.ca/artifactory/g988-libs</url>
+
+                    <releases>
+                        <enabled>true</enabled>
+                        <updatePolicy>daily</updatePolicy>
+                    </releases>
+
+                    <snapshots>
+                        <enabled>true</enabled>
+                        <updatePolicy>always</updatePolicy>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+
+    <activeProfiles>
+        <activeProfile>loc-artifactory</activeProfile>
+    </activeProfiles>
+</settings>
